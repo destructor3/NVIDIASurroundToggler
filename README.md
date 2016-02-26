@@ -1,5 +1,5 @@
 ## NVIDIA Surround Toggler
-SLI/3-Surround Monitor with Center Main Screen Prototype
+SLI/3-Surround Monitor with Center Main Screen Prototype - WORK IN PROGRESS 
 
 NVidia Surround Toggler is a simple tool/program that try to fill the main gap left by NVIDIA in their surround technology's user experience by letting the user toggle between the two modes (Surround and Extended) as fast and with less pain as possible.
 
