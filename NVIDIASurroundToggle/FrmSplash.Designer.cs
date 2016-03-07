@@ -119,13 +119,13 @@
             this.Controls.Add(this.btn_options);
             this.Controls.Add(this.lbl_message);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Icon = global::NVIDIASurroundToggle.Properties.Resources.Surround;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "FrmSplash";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
-            this.Icon = Properties.Resources.Surround;
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FrmSplashFormClosed);
             this.Load += new System.EventHandler(this.FrmSplashLoad);
             this.LocationChanged += new System.EventHandler(this.FrmSplashLocationChanged);

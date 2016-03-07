@@ -187,7 +187,7 @@ namespace NVIDIASurroundToggle
                 Surround.Cleanup();
                 Utility.ToggleTaskbar(true);
                 MessageBox.Show(
-                    string.Format(Language.Program_Fatal_Error__, e.Message),
+                    string.Format(Language.Program_Fatal_Error, e.Message),
                     Language.Program_Fatal_Error,
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);

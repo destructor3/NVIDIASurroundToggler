@@ -19,6 +19,9 @@ namespace NVIDIASurroundToggle
 
         private int _time = 5;
 
+        // Debug FrmSplash Mode
+        private bool debug = true;
+
         public FrmSplash(Action action = null, bool showButtons = true)
         {
             InitializeComponent();
@@ -43,7 +46,14 @@ namespace NVIDIASurroundToggle
 
         private void FrmSplashLoad(object sender, EventArgs e)
         {
-            TopMost = true;
+            if (!debug)
+            {
+                TopMost = true;
+            }
+            else
+            {
+                TopMost = false;
+            }
             Utility.ToggleTaskbar(false);
             if (!_showButtons)
             {
@@ -87,13 +97,20 @@ namespace NVIDIASurroundToggle
         }
 
         private void FrmSplashLocationChanged(object sender, EventArgs e)
-        {
-            Size = new Size(
-                Methods.GetSystemMetrics(SystemMetric.WidthVirtualScreen),
-                Methods.GetSystemMetrics(SystemMetric.HeightVirtualScreen));
-            Location = new Point(
-                Methods.GetSystemMetrics(SystemMetric.XVirtualScreen),
-                Methods.GetSystemMetrics(SystemMetric.YVirtualScreen));
+        {            
+            if (!debug) {
+                Size = new Size(
+                    Methods.GetSystemMetrics(SystemMetric.WidthVirtualScreen),
+                    Methods.GetSystemMetrics(SystemMetric.HeightVirtualScreen)); // DEBUG ONLY
+                Location = new Point(
+                     Methods.GetSystemMetrics(SystemMetric.XVirtualScreen),
+                     Methods.GetSystemMetrics(SystemMetric.YVirtualScreen));
+            } else {
+                Size = new Size(500, 200);
+                Location = new Point(
+                    Methods.GetSystemMetrics(SystemMetric.XVirtualScreen)/2,
+                    Methods.GetSystemMetrics(SystemMetric.YVirtualScreen)/2);
+            }
         }
 
         private void FrmSplashFormClosed(object sender, FormClosedEventArgs e)

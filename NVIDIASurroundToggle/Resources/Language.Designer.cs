@@ -487,16 +487,6 @@ namespace NVIDIASurroundToggle.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Fatal Error: 
-        ///{0}.
-        /// </summary>
-        internal static string Program_Fatal_Error__ {
-            get {
-                return ResourceManager.GetString("Program_Fatal Error__", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to You can&apos;t start a process in extended mode when you have another process in surround mode. Close the other program and try again..
         /// </summary>
         internal static string Program_You_can_t_start_a_process_in_extended_mode_when_you_have_another_process_in_surround_mode__Close_the_other_program_and_try_again_ {
@@ -523,6 +513,42 @@ namespace NVIDIASurroundToggle.Resources {
             get {
                 return ResourceManager.GetString("Surround_Arrangement_panel_is_not_accessible_from_our_side__can_t_save_your_setti" +
                         "ngs_", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t find the Apply Button (WIP for SLI).
+        /// </summary>
+        internal static string Surround_Can_t_find_the_apply_button_ {
+            get {
+                return ResourceManager.GetString("Surround_Can_t_find_the_apply_button_", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t find the Enable SLI RadioButton (WIP for SLI).
+        /// </summary>
+        internal static string Surround_Can_t_find_the_sli_checkbox_ {
+            get {
+                return ResourceManager.GetString("Surround_Can_t_find_the_sli_checkbox_", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t find the Surround Configure Button (WIP for SLI).
+        /// </summary>
+        internal static string Surround_Can_t_find_the_surround_button_ {
+            get {
+                return ResourceManager.GetString("Surround_Can_t_find_the_surround_button_", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t find the Surround RadioButton (WIP for SLI).
+        /// </summary>
+        internal static string Surround_Can_t_find_the_surround_checkbox_ {
+            get {
+                return ResourceManager.GetString("Surround_Can_t_find_the_surround_checkbox_", resourceCulture);
             }
         }
         

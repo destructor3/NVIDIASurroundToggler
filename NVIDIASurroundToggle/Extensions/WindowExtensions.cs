@@ -19,6 +19,7 @@ namespace NVIDIASurroundToggle.Extensions
                                           || style.HasFlag(WindowStyles.WindowEdge)
                                           && !style.HasFlag(WindowStyles.DlgModalFrame));
 
+            System.Windows.Forms.Application.DoEvents();
             Methods.SetWindowLong(handle, -20, Methods.GetWindowLong(handle, -20) ^ 0x80000);
             Methods.SetLayeredWindowAttributes(handle, 0, 1, 0x2);
             Methods.ShowWindow(handle, ShowWindow.Hide);
@@ -36,6 +37,7 @@ namespace NVIDIASurroundToggle.Extensions
                 isResizableAndNotModal
                     ? SetWindowPosFlags.HideWindow
                     : SetWindowPosFlags.HideWindow | SetWindowPosFlags.IgnoreResize);
+            System.Windows.Forms.Application.DoEvents();
         }
 
         public static void ShowFocus(this Window window)
@@ -46,6 +48,7 @@ namespace NVIDIASurroundToggle.Extensions
             var sizeY = Methods.GetSystemMetrics(SystemMetric.HeightVirtualScreen);
             var handle = window.GetHWnd();
             Methods.ShowWindow(handle, ShowWindow.ShowNormal);
+            System.Windows.Forms.Application.DoEvents();
             Methods.SetWindowPos(
                 handle,
                 new IntPtr(-1),
@@ -57,6 +60,7 @@ namespace NVIDIASurroundToggle.Extensions
             window.Focus();
             Methods.SetWindowLong(handle, -20, Methods.GetWindowLong(handle, -20) ^ 0x80000);
             Methods.SetLayeredWindowAttributes(handle, 0, 1, 0x2);
+            System.Windows.Forms.Application.DoEvents();
         }
 
         public static void ShowTopMost(this Window window)

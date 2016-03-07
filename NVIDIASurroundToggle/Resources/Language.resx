@@ -258,10 +258,6 @@
   <data name="Program_Bad_Filename_Specified" xml:space="preserve">
     <value>Bad Filename Specified</value>
   </data>
-  <data name="Program_Fatal Error__" xml:space="preserve">
-    <value>Fatal Error: 
-{0}</value>
-  </data>
   <data name="Program_Fatal_Error" xml:space="preserve">
     <value>Fatal Error</value>
   </data>
@@ -276,5 +272,17 @@
   </data>
   <data name="Surround_NVIDIA_Control_Panel_is_absent_on_this_system_" xml:space="preserve">
     <value>NVIDIA Control Panel is absent on this system.</value>
+  </data>
+  <data name="Surround_Can_t_find_the_surround_checkbox_" xml:space="preserve">
+    <value>Can't find the Surround RadioButton (WIP for SLI)</value>
+  </data>
+  <data name="Surround_Can_t_find_the_sli_checkbox_" xml:space="preserve">
+    <value>Can't find the Enable SLI RadioButton (WIP for SLI)</value>
+  </data>
+  <data name="Surround_Can_t_find_the_apply_button_" xml:space="preserve">
+    <value>Can't find the Apply Button (WIP for SLI)</value>
+  </data>
+  <data name="Surround_Can_t_find_the_surround_button_" xml:space="preserve">
+    <value>Can't find the Surround Configure Button (WIP for SLI)</value>
   </data>
 </root>

@@ -63,7 +63,9 @@ namespace NVIDIASurroundToggle
         private static bool AutomateSurroundSettings(Application application)
         {
             // Waiting for form to become visible
-            var setupDialog = Utility.DefaultOnException(() => application.GetWindow("NVIDIA Set Up Surround"));
+            // TODO FIX MULTILANGUAGE
+            //var setupDialog = Utility.DefaultOnException(() => application.GetWindow("NVIDIA Set Up Surround"));
+            var setupDialog = Utility.DefaultOnException(() => application.GetWindow("Configurazione di NVIDIA Surround"));
             if (setupDialog == null)
             {
                 return true; // Control Panel somehow knows the settings
@@ -74,7 +76,7 @@ namespace NVIDIASurroundToggle
                 setupDialog.HideMinimize();
                 setupDialog.WaitWhileBusy();
                 setupDialog.ShowFocus();
-                FrmSplash.Instance.Focus();
+                FrmSplash.Instance.Focus();                
                 System.Windows.Forms.Application.DoEvents();
 
                 var topologyDropdown =
@@ -261,6 +263,7 @@ namespace NVIDIASurroundToggle
                                 0,
                                 "");
                         }
+                        System.Diagnostics.Debug.WriteLine("IN THE LOOP - Saved Defaults each time you set it.");
 
                         Utility.ContinueException(
                             () =>
@@ -298,7 +301,8 @@ namespace NVIDIASurroundToggle
                             });
 
                         setupDialog.WaitWhileBusy();
-                        if (enableButton.Text.ToLower().Contains("Disable".ToLower()))
+                        // Italian allowance fix
+                        if (enableButton.Text.ToLower().Contains("Disable".ToLower()) || enableButton.Text.ToLower().Contains("Disattiva".ToLower()))
                         {
                             Settings.Default.Save();
                             setupDialog.Close();
@@ -372,16 +376,27 @@ namespace NVIDIASurroundToggle
 
         private static bool AutomateControlPanel(Application application, bool? goSurround)
         {
-            var window = application.GetWindow("NVIDIA Control Panel");
+            // TO-DO: Multilanguage Control Panel Support
+            var window = application.GetWindow("Pannello di controllo NVIDIA"); // ITALIAN 
+            // var window = application.GetWindow("NVIDIA Control Panel"); // ENGLISH
             try
             {
                 window.HideMinimize(); // Hiding also applies the settings we want
-                var surroundTreeItem = window.GetChildWindowWithControlId<UIItem>(4100, 5000);
+
+                // THIS ITEM WORKS IF YOU HAVE MULTIMONITOR BUT NO SLI
+                //var surroundTreeItem = window.GetChildWindowWithControlId<UIItem>(4100, 5000);
+
+                // THIS ITEM WORKS IF YOU HAVE MULTIMONITOR AND SLI
+                var surroundTreeItem = window.GetChildWindowWithControlId<UIItem>(4103, 5000);
+
+                // TO-DO: INTEGRATE BETTER LANGUAGE SUPPORT
+
                 if (surroundTreeItem == null)
-                {
+                {                    
                     throw new Exception(Language.Surround_Can_t_find_the_surround_settings_);
                 }
-                CheckBox surroundCheckbox = null;
+                // Get the Surround Radiobutton
+                RadioButton surroundCheckbox = null;
                 Utility.DoTimeout(
                     () =>
                     {
@@ -392,33 +407,199 @@ namespace NVIDIASurroundToggle
                                 Mouse.Instance.RestoreLocation();
                             });
                         application.WaitWhileBusy();
-                        surroundCheckbox = window.GetChildWindowWithControlId<CheckBox>(1866);
+                        // FIX
+                        // For SLI/Surround config, you get 4 RadioButton, which are 1518 - Optimize 3D / 1864 - Extend with Surround / 1519 - Enable All Screens / 1523 - Disable SLI
+                        surroundCheckbox = window.GetChildWindowWithControlId<RadioButton>(1864);
+                        //surroundCheckbox = window.GetChildWindowWithControlId<CheckBox>(1866);
                         return surroundCheckbox != null;
                     });
                 if (surroundCheckbox == null)
                 {
-                    throw new Exception(Language.Surround_Can_t_find_the_surround_settings_);
+                    // FIXED EXCEPTIONS
+                    throw new Exception(Language.Surround_Can_t_find_the_surround_checkbox_);
                 }
-
-                if (goSurround != null && surroundCheckbox.Checked == goSurround)
+                // Get the SLI Radiobutton
+                RadioButton standardSLICheckbox = null;
+                Utility.DoTimeout(
+                    () =>
+                    {
+                        window.ExecuteAutomationAction(
+                            () =>
+                            {
+                                Utility.ContinueException(() => surroundTreeItem.Click());
+                                Mouse.Instance.RestoreLocation();
+                            });
+                        application.WaitWhileBusy();
+                        // Get the Enable SLI button (single Monitors)
+                        standardSLICheckbox = window.GetChildWindowWithControlId<RadioButton>(1518);
+                        return standardSLICheckbox != null;
+                    });
+                if (standardSLICheckbox == null)
+                {
+                    // FIXED EXCEPTIONS
+                    throw new Exception(Language.Surround_Can_t_find_the_sli_checkbox_);
+                }
+                // Get the CONFIG BUTTON (the only way to check if "Surround" is enabled - we don't have the Checkbox value in SLI mode)
+                Button configureSurroundButton = null;
+                Utility.DoTimeout(
+                    () =>
+                    {
+                        window.ExecuteAutomationAction(
+                            () =>
+                            {
+                                Utility.ContinueException(() => surroundTreeItem.Click());
+                                Mouse.Instance.RestoreLocation();
+                            });
+                        application.WaitWhileBusy();
+                        // Get the Enable SLI button (single Monitors)
+                        configureSurroundButton = window.GetChildWindowWithControlId<Button>(1865);
+                        return configureSurroundButton != null;
+                    });
+                if (configureSurroundButton == null)
+                {
+                    // FIXED EXCEPTIONS
+                    throw new Exception(Language.Surround_Can_t_find_the_surround_button_);
+                }
+                
+                // Check if Link triggered an already done choice (EG: enable when enabled)
+                if (goSurround != null && surroundCheckbox.IsSelected == goSurround)
                 {
                     window.Close();
                     window.WaitWhileBusy();
                     return false;
                 }
 
-                goSurround = !surroundCheckbox.Checked;
-                var success = window.ExecuteAutomationAction(
+                /* fixing for RadioButton */
+                goSurround = !configureSurroundButton.Enabled;
+
+                var success = false;
+
+                //Utility.ContinueException(() => surroundCheckbox.checked = goSurround.Value); // can't toggle the "checked" for radiobuttons
+                // BUT i'll toggle instead the Optimize 3D sequence with a new function
+
+                if (!goSurround.Value)
+                {
+                    if (Utility.DoTimeout(
+                        () =>
+                        {
+                            window.ExecuteAutomationAction(
+                                () =>
+                                {
+                                    Utility.ContinueException(() => standardSLICheckbox.Click());
+                                    Mouse.Instance.RestoreLocation();
+                                });
+                            application.WaitWhileBusy();
+                            return true;
+                        })) { }
+                } else {
+
+                    if (Utility.DoTimeout(
+                        () =>
+                        {
+                            window.ExecuteAutomationAction(
+                                () =>
+                                {
+                                    Utility.ContinueException(() => surroundCheckbox.Click());
+                                    Mouse.Instance.RestoreLocation();
+                                });
+                            application.WaitWhileBusy();
+                            return true;
+                        })) { }
+                }
+
+                window.HideMinimize();
+                window.WaitWhileBusy();
+                window.ShowFocus();
+                FrmSplash.Instance.Focus();
+                System.Windows.Forms.Application.DoEvents();
+
+                // Get the APPLY BUTTON
+                Button applyButton = null;
+                Utility.DoTimeout(
+                    () =>
+                    {
+                        window.ExecuteAutomationAction(
+                            () =>
+                            {
+                                Utility.ContinueException(() => surroundTreeItem.Click());
+                                Mouse.Instance.RestoreLocation();
+                            });
+                        application.WaitWhileBusy();
+                        // Get the Apply Button
+                        applyButton = window.GetChildWindowWithControlId<Button>(1021);
+                        return applyButton != null;
+                    });
+                if (applyButton == null)
+                {
+                    // FIXED EXCEPTIONS
+                    throw new Exception(Language.Surround_Can_t_find_the_apply_button_);
+                }
+
+                // Click on the applyButton
+                //var applyButton = Utility.DefaultOnException( () => window.Get<Button>(SearchCriteria.ByAutomationId("1021")));
+                if (applyButton != null && Utility.DoTimeout(
+                    () =>
+                    {
+                        window.ExecuteAutomationAction(
+                            () => Utility.ContinueException(() => applyButton.Click()));
+                        Mouse.Instance.RestoreLocation();
+                        window.WaitWhileBusy();
+                        application.WaitWhileBusy();
+                        return applyButton.IsOffScreen || !applyButton.Enabled;
+                    }))
+                {
+                    success = true;
+                }
+
+
+                /*var success = window.ExecuteAutomationAction(
                     () =>
                     {
                         if (Utility.DoTimeout(
                             () =>
                             {
-                                Utility.ContinueException(() => surroundCheckbox.Checked = goSurround.Value);
-                                Mouse.Instance.RestoreLocation();
-                                window.WaitWhileBusy();
-                                application.WaitWhileBusy();
-                                return surroundCheckbox.Checked == goSurround;
+                                
+
+                                if (!goSurround.Value)
+                                {
+                                    // We must DISABLE surround
+                                   
+                                    // Click on that SLI Checkbox
+                                    Utility.ContinueException(() => standardSLICheckbox.Click());
+                                    Mouse.Instance.RestoreLocation();                              
+                                    window.WaitWhileBusy();
+                                    application.WaitWhileBusy();
+
+                                    // CHECK if SLI Enabled and Surround disabled
+                                    if (!configureSurroundButton.Enabled)
+                                    {
+                                        System.Diagnostics.Debug.WriteLine("SLI Enabled!");
+                                        return true;
+                                    }
+
+                                }
+                                else
+                                {
+                                    // We must ENABLE surround
+
+                                    // Click on Surround Checkbox
+                                    Utility.ContinueException(() => surroundCheckbox.Click());
+                                    Mouse.Instance.RestoreLocation();
+                                    window.WaitWhileBusy();
+                                    application.WaitWhileBusy();
+
+                                    // CHECK if SLI Disabled and Surround Enabled
+                                    if (configureSurroundButton.Enabled)
+                                    {
+                                        System.Diagnostics.Debug.WriteLine("SURROUND Enabled!");
+                                        return true;
+                                    }
+                                }
+                                // END new code
+                                
+                                // Can't return a Checkbox value - this is a Radio Button!                                                         
+                                // It should have returned; if it didn't, something is wrong.
+                                return false;
                             }))
                         {
                             var applyButton =
@@ -429,7 +610,7 @@ namespace NVIDIASurroundToggle
                                 {
                                     window.ExecuteAutomationAction(
                                         () => Utility.ContinueException(() => applyButton.Click()));
-                                    Mouse.Instance.RestoreLocation();
+                                    Mouse.Instance.RestoreLocation();                                    
                                     window.WaitWhileBusy();
                                     application.WaitWhileBusy();
                                     return applyButton.IsOffScreen || !applyButton.Enabled;
@@ -439,7 +620,7 @@ namespace NVIDIASurroundToggle
                             }
                         }
                         return false;
-                    });
+                    }); */
 
                 if (!success)
                 {
@@ -447,6 +628,7 @@ namespace NVIDIASurroundToggle
                 }
 
                 var result = true;
+                System.Diagnostics.Debug.WriteLine("GoSurround Value: " + goSurround.Value.ToString());
                 if (goSurround.Value)
                 {
                     result = AutomateSurroundSettings(application);
@@ -661,5 +843,6 @@ namespace NVIDIASurroundToggle
                 });
             return result;
         }
+
     }
 }
